@@ -1,0 +1,3 @@
+[settings]
+computer_name = "KonfigShell"
+vfs_archive_path = "virtual_fs/example.tar"
