@@ -1,7 +1,14 @@
-import pytest
-from src.shell_emulator import Shell
+import unittest
+from shell_emulator import Shell
 
-def test_cd():
-    shell = Shell()
-    assert "Текущая директория" in shell.cd("/")
-    assert "Директория не найдена" in shell.cd("/неизвестная_папка")
+class TestCd(unittest.TestCase):
+    def setUp(self):
+        self.shell = Shell("config/config.toml", "virtual_fs/example.tar", None)
+
+    def test_change_directory(self):
+        result = self.shell.execute_command("cd", "/home")
+        self.assertIn("/home", result)
+
+    def test_invalid_directory(self):
+        result = self.shell.execute_command("cd", "/invalid")
+        self.assertIn("Директория не найдена", result)

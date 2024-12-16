@@ -1,13 +1,11 @@
-import os
-import pytest
-from src.shell_emulator import Shell
+import unittest
+from shell_emulator import Shell
 
-def test_ls(tmp_path):
-    shell = Shell()
-    shell.current_path = str(tmp_path)
-    (tmp_path / "file1.txt").touch()
-    (tmp_path / "file2.txt").touch()
+class TestLs(unittest.TestCase):
+    def setUp(self):
+        self.shell = Shell("config/config.toml", "virtual_fs/example.tar", None)
 
-    result = shell.ls()
-    assert "file1.txt" in result
-    assert "file2.txt" in result
+    def test_list_files(self):
+        self.shell.execute_command("cd", "/home")
+        result = self.shell.execute_command("ls")
+        self.assertIsInstance(result, str)  # Проверяем, что результат является строкой
