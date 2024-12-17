@@ -1,6 +1,6 @@
 {
-    "plantuml_path": "/opt/homebrew/Cellar/plantuml/1.2024.8/libexec/plantuml.jar",
+    "visualization_path": "/opt/homebrew/Cellar/plantuml/1.2024.8/libexec/plantuml.jar",
     "repo_path": "/Users/riakka/Desktop/Konfig",
-    "output_image_path": "/Users/riakka/Desktop/Konfig/дз2/graph.png",
+    "image_path": "/Users/riakka/Desktop/Konfig/дз2/graph.png",
     "branch_name": "master"
 }
