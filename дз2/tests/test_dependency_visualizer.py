@@ -1,57 +1,64 @@
-import pytest
 import os
-from unittest.mock import patch, mock_open, MagicMock
-from dependency_visualizer import load_config, get_commit_graph, create_image
+import pytest
+from dependency_visualizer import (
+    read_object,
+    get_commit_info,
+    get_commit_history,
+    translate,
+    comp,
+    save_diagram,
+)
 
-# Тест для load_config
-def test_load_config():
-    mock_config = """
-    {
-        "repo_path": "/fake/repo",
-        "branch_name": "main",
-        "plantuml_path": "/fake/plantuml.jar",
-        "output_image_path": "output.png"
+def test_read_object():
+    sha = 'abc123'  # Пример SHA для теста
+    obj_type, content = read_object(sha)
+    assert obj_type is not None, "Объект Git не найден"
+    assert content is not None, "Содержимое объекта Git не найдено"
+
+def test_get_commit_info():
+    sha = 'abc123'
+    commit_info = get_commit_info(sha)
+    assert commit_info is not None, "Информация о коммите не получена"
+    assert commit_info['hash'] == sha, "Неверный SHA коммита"
+    assert 'author' in commit_info, "Отсутствует информация об авторе коммита"
+
+def test_get_commit_history():
+    repo_path = '/Users/riakka/Desktop/Konfig'  
+    branch_name = 'master'  
+    try:
+        commit_info = get_commit_history(repo_path, branch_name)
+        assert commit_info is not None, "История коммитов не получена"
+    except FileNotFoundError:
+        pytest.fail(f"Не найдена ветка {branch_name} или репозиторий по пути {repo_path}")
+
+def test_translate():
+    mock_commit_info = {
+        'hash': 'abc123',
+        'author': 'John Doe 1672531200 +0000',
+        'parent': None,
     }
-    """
-    with patch("builtins.open", mock_open(read_data=mock_config)):
-        config = load_config("config.json")
-        assert config["repo_path"] == "/fake/repo"
-        assert config["branch_name"] == "main"
-        assert config["plantuml_path"] == "/fake/plantuml.jar"
-        assert config["output_image_path"] == "output.png"
+    commits = translate(mock_commit_info)
+    assert len(commits) == 1, "Неверное количество коммитов"
+    assert commits[0][0] == 'abc123', "Неверный SHA коммита в списке"
+    assert commits[0][1] == 'John', "Неверный автор коммита"
 
-# Тест для get_commit_graph
-@patch("dependency_visualizer.Repo")
-def test_get_commit_graph(mock_repo):
-    # Подготовка мока для коммита
-    mock_commit = MagicMock()
-    mock_commit.hexsha = "abc123"
-    mock_repo.return_value.iter_commits.return_value = [mock_commit]
+def test_comp():
+    # Тестирование генерации PlantUML
+    commits = [
+        ('abc123', 'John', '2023-01-01 00:00:00'),
+        ('def456', 'Alice', '2023-01-02 00:00:00'),
+    ]
+    plantuml_code = comp(commits)
+    assert '@startuml' in plantuml_code, "PlantUML код должен начинаться с @startuml"
+    assert '@enduml' in plantuml_code, "PlantUML код должен заканчиваться @enduml"
+    assert 'abc123 : 2023-01-01 00:00:00' in plantuml_code, "Отсутствует информация о коммите"
 
-    repo_path = "/fake/repo"
-    branch_name = "main"
-    graph = get_commit_graph(repo_path, branch_name)
-
-    # Проверка, что граф содержит ожидаемые данные
-    assert "@startuml" in graph
-    assert "@enduml" in graph
-    assert "abc123" in graph  # Хэш коммита должен присутствовать
-
-# Тест для create_image
-@pytest.mark.skip(reason="Requires PlantUML installed")
-def test_create_image():
-    graph = "@startuml\nA --> B\n@enduml"
-    plantuml_path = "/fake/plantuml.jar"
-    output_image_path = "output.png"
-
-    with patch("subprocess.run") as mock_run:
-        create_image(graph, plantuml_path, output_image_path)
-
-        # Проверяем, что subprocess.run вызван с правильными аргументами
-        mock_run.assert_called_with(
-            ["java", "-jar", plantuml_path, "-p"],
-            input=graph.encode(),
-            stdout=pytest.mock.ANY,
-            stderr=pytest.mock.ANY,
-            check=True
-        )
+def test_save_diagram():
+    plantuml_code = '@startuml\nabc123 : 2023-01-01 00:00:00\n@enduml'
+    image_path = 'test_graph.png'
+    try:
+        save_diagram(plantuml_code, image_path)
+        assert os.path.isfile(image_path), "Файл диаграммы не создан"
+    finally:
+        if os.path.isfile(image_path):
+            os.remove(image_path)
