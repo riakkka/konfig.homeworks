@@ -117,3 +117,7 @@ OK
 ## Графический интерфейс
 
 ![графический интерфейс](дз1/image/emulator.png)
+
+
+## Ссылка на репозиторий
+https://github.com/riakkka/konfig.homeworks.git
