@@ -1,19 +1,11 @@
 import xml.etree.ElementTree as ET
 
-def parse_xml(xml_data):
-    """
-    Парсит XML-данные и возвращает дерево элементов.
-    """
+def parse_xml(xml_string):
+    if not xml_string.strip():  # Проверка на пустую строку
+        raise ET.ParseError("XML string is empty")
+    
     try:
-        tree = ET.ElementTree(ET.fromstring(xml_data))
-        return tree
+        return ET.fromstring(xml_string)
     except ET.ParseError as e:
         print(f"Ошибка при разборе XML: {e}")
-        return None
-
-def validate_xml(xml_data):
-    """
-    Валидирует синтаксис XML.
-    Возвращает True, если XML корректен, иначе False.
-    """
-    return parse_xml(xml_data) is not None
+        raise  # Повторное выбрасывание исключения, чтобы тесты могли его поймать

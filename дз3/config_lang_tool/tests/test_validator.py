@@ -4,13 +4,12 @@ from validator import validate_xml
 class TestValidator(unittest.TestCase):
     def test_valid_xml(self):
         valid_xml = """<root><item>10</item><item>20</item></root>"""
-        result = validate_xml(valid_xml)
-        self.assertTrue(result)
+        self.assertTrue(validate_xml(valid_xml))
 
     def test_invalid_xml(self):
         invalid_xml = "<root><item>10<item></root>"
-        result = validate_xml(invalid_xml)
-        self.assertFalse(result)
+        self.assertFalse(validate_xml(invalid_xml))
 
-if __name__ == '__main__':
-    unittest.main()
+    def test_empty_xml(self):
+        empty_xml = ""
+        self.assertFalse(validate_xml(empty_xml))  # Пустой XML считается некорректным

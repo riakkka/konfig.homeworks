@@ -1,18 +1,22 @@
 import unittest
-from parser import parse_xml
+import xml.etree.ElementTree as ET
+from parser import parse_xml  # Импорт функции parse_xml
 
 class TestParser(unittest.TestCase):
-    def test_parse_valid_xml(self):
-        xml_data = """<root><item>10</item><item>20</item></root>"""
-        result = parse_xml(xml_data)
-        self.assertIsNotNone(result)
-        self.assertEqual(result.tag, 'root')
-        self.assertEqual(len(result), 2)
-    
-    def test_parse_invalid_xml(self):
-        invalid_xml = "<root><item>10<item></root>"
-        with self.assertRaises(Exception):
-            parse_xml(invalid_xml)
 
-if __name__ == '__main__':
-    unittest.main()
+    def test_parse_valid_xml(self):
+        valid_xml = "<root><child>Test</child></root>"
+        result = parse_xml(valid_xml)
+        # Убедимся, что возвращается корневой элемент
+        self.assertEqual(result.tag, 'root')  # Проверяем тег корневого элемента
+        self.assertEqual(result[0].tag, 'child')  # Проверяем тег первого дочернего элемента
+
+    def test_parse_empty_xml(self):
+        empty_xml = ""  # Пустая строка
+        with self.assertRaises(ET.ParseError):  # Пустой XML должен вызывать ошибку
+            parse_xml(empty_xml)
+
+    def test_parse_invalid_xml(self):
+        invalid_xml = "<root><child>Test</root>"  # Некорректный XML
+        with self.assertRaises(ET.ParseError):  # Ожидаем ошибку
+            parse_xml(invalid_xml)
