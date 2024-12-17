@@ -1,0 +1,29 @@
+<root>
+  <config>
+      <arrays>
+          <array>[ 10, 20, 30, 40 ]</array>
+      </arrays>
+      <dictionaries>
+          <dictionary>
+              dict(
+                  имя1 = 10,
+                  имя2 = [ 1, 2, 3 ],
+                  имя3 = dict(
+                      вложенная_имя1 = 100,
+                      вложенная_имя2 = 200
+                  )
+              )
+          </dictionary>
+      </dictionaries>
+      <constants>
+          <constant>
+              def MY_CONSTANT = 105
+          </constant>
+      </constants>
+      <evaluations>
+          <evaluation>
+              {MY_CONSTANT}
+          </evaluation>
+      </evaluations>
+  </config>
+</root>
